@@ -1,12 +1,6 @@
 #include "main.h"
 
-void serial_tx(uint8_t dat)
-{
-  while (USART_GetFlagStatus(USART_FLAG_TXE) == RESET)
-  {
-  }
-  USART_SendData8(dat);
-}
+uint8_t flags = 0;
 
 void main(void)
 {
@@ -14,31 +8,86 @@ void main(void)
   
   Init_Application();
     
-  serial_tx('O');
-  serial_tx('k');
-  serial_tx(10);
-    
   while (1)
   {
-    CSN_LOW();
-    chr = nrf_send_read(cmdNOP);
-    CSN_HIGH();
-    if(chr&0x40)
+    checkButtonDebounced();
+    
+    if (flags & _FL_KEY)
     {
-      CSN_LOW();
-      nrf_send_read(cmdWRITE_REG + regSTATUS);
-      nrf_send_read(1<<RX_DR | 1<<TX_DS | 1<<MAX_RT);
-      CSN_HIGH();
+      deinitNRF();
+      LED_1_OFF();
+      
+      if (flags & _FL_SNIFFER)  // sniffer -> meter
+      {
+        initNRF_meter();
+        flags &= ~_FL_SNIFFER;
+        LED_2_OFF();
+      }
+      else                      // meter -> sniffer
+      {
+        initNRF_sniffer();
+        flags |= _FL_SNIFFER;
+        LED_2_ON();
+      }
+      
+      flags &= ~_FL_KEY;
     }
-    if((chr&0x0E) != 0x0E)
+
+    if (flags & _FL_SNIFFER)    // sniffer mode
     {
-      serial_tx(252);	// frame marker
       CSN_LOW();
-      nrf_send_read(cmdRD_RX_PLOAD);
-      for(uint8_t i=0; i<32; i++)
-        serial_tx(nrf_send_read(cmdNOP));
+      chr = nrf_send_read(cmdNOP);
       CSN_HIGH();
-      LED_1_TOG();
+      if(chr&0x40)
+      {
+        CSN_LOW();
+        nrf_send_read(cmdWRITE_REG + regSTATUS);
+        nrf_send_read(1<<RX_DR | 1<<TX_DS | 1<<MAX_RT | 1<<TX_FULL);
+        CSN_HIGH();
+      }
+      if((chr&0x0E) != 0x0E)
+      {
+        serial_tx(252);	// frame marker
+        serial_tx('S');	// packet type
+        serial_tx(chr);
+        CSN_LOW();
+        nrf_send_read(cmdRD_RX_PLOAD);
+        chr = nrf_send_read(cmdNOP);
+        serial_tx(chr);
+        chr = nrf_send_read(cmdNOP);
+        serial_tx(chr);
+        chr = nrf_send_read(cmdNOP);
+        serial_tx(chr);
+        chr = nrf_send_read(cmdNOP);
+        serial_tx(chr);
+        CSN_HIGH();
+        for(uint8_t i=0; i<26; i++)
+          serial_tx(0);
+        LED_1_TOG();
+      }
+    }
+    else        // meter mode
+    {
+      CSN_LOW();
+      chr = nrf_send_read(cmdNOP);
+      CSN_HIGH();
+      if(chr&0x40)
+      {
+        CSN_LOW();
+        nrf_send_read(cmdWRITE_REG + regSTATUS);
+        nrf_send_read(1<<RX_DR | 1<<TX_DS | 1<<MAX_RT);
+        CSN_HIGH();
+      }
+      if((chr&0x0E) != 0x0E)
+      {
+        serial_tx(252);	// frame marker
+        CSN_LOW();
+        nrf_send_read(cmdRD_RX_PLOAD);
+        for(uint8_t i=0; i<32; i++)
+          serial_tx(nrf_send_read(cmdNOP));
+        CSN_HIGH();
+        LED_1_TOG();
+      }
     }
   }
 }

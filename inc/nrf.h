@@ -1,4 +1,6 @@
-void initNRF(void);
+void deinitNRF(void);
+void initNRF_meter(void);
+void initNRF_sniffer(void);
 unsigned char nrf_send_read(unsigned char);
 
 #define	cmdREAD_REG	0x00	// Read command and status registers. AAAAA = 5 bit Register Map Address

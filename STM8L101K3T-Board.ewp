@@ -488,7 +488,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state></state>
+                    <state>STM8L101K3T-Board.srec</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -826,10 +826,16 @@
         <name>$PROJ_DIR$\Debug\Exe\FWLib.a</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\src\key.c</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\src\main.c</name>
     </file>
     <file>
         <name>$PROJ_DIR$\src\nrf.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\src\serial.c</name>
     </file>
     <file>
         <name>$PROJ_DIR$\src\stm8l10x_it.c</name>

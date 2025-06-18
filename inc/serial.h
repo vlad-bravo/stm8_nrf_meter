@@ -1,0 +1,1 @@
+void serial_tx(uint8_t);

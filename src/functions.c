@@ -24,8 +24,8 @@ void Init_GPIO(void)
 {
     GPIO_Init(LED_1_PORT, LED_1_PIN, GPIO_Mode_Out_PP_High_Fast);
     GPIO_Init(LED_2_PORT, LED_2_PIN, GPIO_Mode_Out_PP_High_Fast);
-    GPIO_Init(GPIOA, GPIO_Pin_3, GPIO_Mode_In_PU_No_IT);   // NRF_IRQ
-    GPIO_Init(GPIOB, GPIO_Pin_1, GPIO_Mode_In_PU_No_IT);   // K1
+    GPIO_Init(NRF_IRQ_PORT, NRF_IRQ_PIN, GPIO_Mode_In_PU_No_IT);   // NRF_IRQ
+    GPIO_Init(KEY_PORT, KEY_PIN, GPIO_Mode_In_PU_No_IT);   // K1
 }
 
 void Init_Clock(void)
@@ -45,9 +45,10 @@ void Init_Application(void)
     Init_GPIO();
     Init_SPIFullDuplex();
     Init_USART();
-    initNRF();
+    deinitNRF();
+    initNRF_meter();
     delay(10000);
-    initNRF();
+    initNRF_meter();
 }
 
 void delay(unsigned long int n)
