@@ -9,6 +9,8 @@
 #include "nrf.h"
 #include "serial.h"
 #include "key.h"
+#include "ring.h"
+#include "parser.h"
 
 /* FLAGS */
 extern uint8_t flags;

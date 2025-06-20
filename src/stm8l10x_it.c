@@ -591,6 +591,18 @@ __interrupt void USART_RX_IRQHandler(void)
     /* In order to detect unexpected events during development,
        it is recommended to set a breakpoint on the following instruction.
     */
+
+    if(USART_GetITStatus(USART_IT_RXNE) != RESET)
+    {
+        // Read the received data
+        uint8_t receivedData = USART_ReceiveData8();
+        
+        // store to ring buffer, set flag
+        RING_Put(receivedData);
+        
+        // Clear the interrupt flag
+        USART_ClearITPendingBit();
+    }
 }
 
 

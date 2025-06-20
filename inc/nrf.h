@@ -1,7 +1,10 @@
 void deinitNRF(void);
 void initNRF_meter(void);
+void Init_Payload(void);
 void initNRF_sniffer(void);
 unsigned char nrf_send_read(unsigned char);
+
+extern uint8_t payload[16];
 
 #define	cmdREAD_REG	0x00	// Read command and status registers. AAAAA = 5 bit Register Map Address
 #define	cmdWRITE_REG	0x20	// Write command and status registers. AAAAA = 5 bit Register Map Address. Executable in power down or standby modes only

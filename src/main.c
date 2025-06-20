@@ -7,11 +7,15 @@ void main(void)
   uint8_t chr;
   
   Init_Application();
+  
+  enableInterrupts();
     
   while (1)
   {
+    // Check keyboard input
     checkButtonDebounced();
     
+    // Check keyboard flag
     if (flags & _FL_KEY)
     {
       deinitNRF();
@@ -33,6 +37,7 @@ void main(void)
       flags &= ~_FL_KEY;
     }
 
+    // Check device mode - sniffer or meter
     if (flags & _FL_SNIFFER)    // sniffer mode
     {
       CSN_LOW();
@@ -71,14 +76,18 @@ void main(void)
       CSN_LOW();
       chr = nrf_send_read(cmdNOP);
       CSN_HIGH();
-      if(chr&0x40)
+      if(chr & (1<<RX_DR | 1<<TX_DS | 1<<MAX_RT | 1<<TX_FULL))
       {
         CSN_LOW();
         nrf_send_read(cmdWRITE_REG + regSTATUS);
-        nrf_send_read(1<<RX_DR | 1<<TX_DS | 1<<MAX_RT);
+        nrf_send_read(1<<RX_DR | 1<<TX_DS | 1<<MAX_RT | 1<<TX_FULL);
         CSN_HIGH();
       }
-      if((chr&0x0E) != 0x0E)
+      if ((chr&0x0E) == 0x02)   // Payload for pipe 1 - command
+      {
+        Init_Payload();
+      }
+      else if ((chr&0x0E) != 0x0E)
       {
         serial_tx(252);	// frame marker
         CSN_LOW();
@@ -89,7 +98,13 @@ void main(void)
         LED_1_TOG();
       }
     }
-  }
+
+    // Check usart rx buffer
+    if (RING_GetCount() > 0)
+    {
+      Parser();
+    }
+  }     // while (1)
 }
 
 #ifdef  USE_FULL_ASSERT

@@ -15,9 +15,17 @@ void Init_SPIFullDuplex(void)
 void Init_USART(void)
 {
   USART_DeInit();
-  USART_Init(625000, USART_WordLength_8D, USART_StopBits_1, USART_Parity_No, (USART_Mode_Rx | USART_Mode_Tx));  // BaudRate value should be < 625000 bps
+  USART_Init(
+    625000,  // BaudRate value should be < 625000 bps
+    USART_WordLength_8D,
+    USART_StopBits_1,
+    USART_Parity_No,
+    (USART_Mode_Rx | USART_Mode_Tx)
+  );
   
   USART_Cmd(ENABLE);
+  
+  USART_ITConfig(USART_IT_RXNE, ENABLE);
 }
 
 void Init_GPIO(void)
@@ -49,6 +57,8 @@ void Init_Application(void)
     initNRF_meter();
     delay(10000);
     initNRF_meter();
+    payload[0] = '!';   // !!! TEST ONLY !!!
+    Init_Payload();
 }
 
 void delay(unsigned long int n)
