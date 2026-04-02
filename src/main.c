@@ -83,11 +83,7 @@ void main(void)
         nrf_send_read(1<<RX_DR | 1<<TX_DS | 1<<MAX_RT | 1<<TX_FULL);
         CSN_HIGH();
       }
-      if ((chr&0x0E) == 0x02)   // Payload for pipe 1 - command
-      {
-        Init_Payload();
-      }
-      else if ((chr&0x0E) != 0x0E)
+      if ((chr&0x0E) != 0x0E)
       {
         serial_tx(252);	// frame marker
         CSN_LOW();

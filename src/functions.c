@@ -54,11 +54,10 @@ void Init_Application(void)
     Init_SPIFullDuplex();
     Init_USART();
     deinitNRF();
+    payload[0] = '!';   // !!! TEST ONLY !!!
     initNRF_meter();
     delay(10000);
     initNRF_meter();
-    payload[0] = '!';   // !!! TEST ONLY !!!
-    Init_Payload();
 }
 
 void delay(unsigned long int n)

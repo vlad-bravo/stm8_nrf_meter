@@ -1,6 +1,5 @@
 void deinitNRF(void);
 void initNRF_meter(void);
-void Init_Payload(void);
 void initNRF_sniffer(void);
 unsigned char nrf_send_read(unsigned char);
 
