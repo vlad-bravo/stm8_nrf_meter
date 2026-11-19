@@ -1,6 +1,7 @@
 #include "functions.h"
 
 uint8_t symbol;
+uint8_t index;
 
 void Parser(void)
 {
@@ -24,6 +25,18 @@ void Parser(void)
         initNRF_sniffer();
         flags |= _FL_SNIFFER;
         LED_2_ON();
+        break;
+
+      case 'p':
+        index = 2;
+        payload[1] = '@';
+        while (RING_GetCount() > 0)
+        {
+          symbol = RING_Pop();
+          if(index < 16)
+            payload[index] = symbol;
+          index++;
+        }
         break;
     }
   }
